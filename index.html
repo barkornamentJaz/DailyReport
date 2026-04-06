@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Finance Report — Bark Ornament</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 12px;
+  background: #d0d0d0;
+  color: #222;
+  padding: 20px;
+}
+.page {
+  background: #fff;
+  max-width: 820px;
+  margin: 0 auto;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+}
+.print-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #555;
+  padding: 4px 10px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.doc-header-left { display: flex; align-items: center; gap: 12px; }
+.logo-box {
+  width: 56px; height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  display: flex; align-items: center; justify-content: center;
+  background: #fafafa;
+}
+.logo-box img { width: 52px; }
+.company-info h1 { font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+.company-info p { font-size: 10.5px; color: #555; line-height: 1.6; margin-top: 2px; }
+.doc-header-right { text-align: right; }
+.doc-header-right h2 { font-size: 17px; font-weight: 700; color: #1a3a6e; line-height: 1.2; }
+.doc-header-right p { font-size: 10.5px; color: #555; line-height: 1.7; margin-top: 2px; }
+
+.controls {
+  background: #f1f3f4;
+  padding: 8px 20px;
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.controls button {
+  background: #1a3a6e;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  font-size: 10.5px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.controls button:hover { background: #0d2550; }
+
+@media print {
+  .controls, .print-bar { display: none !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  body { background: #fff !important; padding: 0 !important; }
+  .page { box-shadow: none !important; max-width: 100% !important; }
+  .section-head { background: #1a3a6e !important; color: #fff !important; }
+  .section-head.usd { background: #2c5282 !important; }
+  thead tr { background: #1a3a6e !important; color: #fff !important; }
+  thead.usd-head tr { background: #2c5282 !important; }
+  .region-card-head { background: #2c4a7c !important; color: #fff !important; }
+  .region-card thead tr { background: #3d5a91 !important; }
+  .region-card tr.reg-total td { background: #dde3f0 !important; color: #1a3a6e !important; }
+  .region-card tr.reg-grand-total td { background: #1a3a6e !important; color: #f0c040 !important; }
+  .region-card tr.reg-grand-total td:first-child { color: #fff !important; }
+  tr.grand-row td { background: #f0f0f0 !important; color: #1a3a6e !important; }
+  tr.subtotal-row td { background: #eef2fa !important; }
+  tbody tr:nth-child(even) { background: #f7f8fc !important; }
+  .kpi-card.orange { border-left: 4px solid #e67e22 !important; }
+  .kpi-card.blue   { border-left: 4px solid #2980b9 !important; }
+  .kpi-card.green  { border-left: 4px solid #27ae60 !important; }
+  .grand-outstanding { border: 2px solid #1a3a6e !important; }
+  .grand-outstanding-head { background: #1a3a6e !important; color: #fff !important; }
+  .grand-outstanding thead tr { background: #2c4a7c !important; }
+  .grand-outstanding tr.go-total td { background: #1a3a6e !important; color: #fff !important; }
+  .grand-outstanding tr.go-total td.money-gold { color: #f0c040 !important; }
+  tbody td.money-red { color: #c0392b !important; }
+  tbody td.money-blue { color: #2980b9 !important; }
+  tbody td.money-green { color: #27ae60 !important; }
+  .kpi-card.orange .kpi-value { color: #e67e22 !important; }
+  .kpi-card.blue   .kpi-value { color: #2980b9 !important; }
+  .kpi-card.green  .kpi-value { color: #27ae60 !important; }
+}
+
+.body { padding: 0 20px 20px; }
+
+.section-head {
+  background: #1a3a6e;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  margin-top: 16px;
+}
+.section-head.usd { background: #2c5282; }
+
+.kpi-row {
+  display: flex;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+}
+.kpi-card { flex: 1; padding: 10px 14px; border-right: 1px solid #e8e8e8; }
+.kpi-card:last-child { border-right: none; }
+.kpi-card.orange { border-left: 4px solid #e67e22; }
+.kpi-card.blue   { border-left: 4px solid #2980b9; }
+.kpi-card.green  { border-left: 4px solid #27ae60; }
+.kpi-label { font-size: 9px; font-weight: 700; color: #888; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.kpi-value { font-size: 18px; font-weight: 700; line-height: 1; }
+.kpi-card.orange .kpi-value { color: #e67e22; }
+.kpi-card.blue   .kpi-value { color: #2980b9; }
+.kpi-card.green  .kpi-value { color: #27ae60; }
+
+table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+thead tr { background: #1a3a6e; color: #fff; }
+thead.usd-head tr { background: #2c5282; }
+thead th { padding: 7px 12px; font-weight: 700; font-size: 10.5px; letter-spacing: 0.05em; text-align: left; text-transform: uppercase; }
+thead th.r { text-align: right; }
+tbody tr { border-bottom: 1px solid #eee; }
+tbody tr:nth-child(even) { background: #f7f8fc; }
+tbody td { padding: 7px 12px; text-align: left; }
+tbody td.r { text-align: right; }
+tbody td.money-red   { text-align: right; color: #c0392b; font-weight: 600; }
+tbody td.money-green { text-align: right; color: #27ae60; font-weight: 600; }
+tbody td.money-blue  { text-align: right; color: #2980b9; font-weight: 600; }
+.empty-row td { text-align: center !important; color: #999; font-style: italic; padding: 10px; background: #fafafa; }
+
+tr.subtotal-row td {
+  background: #eef2fa;
+  font-weight: 600;
+  color: #333;
+  padding: 7px 12px;
+  border-top: 1px solid #d0d8ee;
+}
+tr.grand-row td {
+  background: #f0f0f0;
+  font-weight: 700;
+  color: #1a3a6e;
+  padding: 7px 12px;
+  border-top: 2px solid #c0c8d8;
+  text-align: right;
+}
+tr.grand-row td:first-child { text-align: left; color: #333; }
+
+.region-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.region-card {
+  width: 100%;
+  border: 1px solid #dde3f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.region-card-head {
+  background: #2c4a7c;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.region-card-head .region-date {
+  font-size: 9px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  font-style: italic;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.region-card table { font-size: 10.5px; }
+.region-card thead tr { background: #3d5a91; }
+.region-card thead th { padding: 5px 8px; font-size: 9.5px; }
+.region-card thead th.r { text-align: right; }
+.region-card tbody td { padding: 5px 8px; }
+.region-card tbody td.r { text-align: right; }
+.region-card tbody td.money-red { text-align: right; color: #c0392b; font-weight: 600; font-size: 10.5px; }
+.region-card .empty-row td { padding: 8px; font-size: 10px; }
+.region-card tr.reg-total td {
+  background: #dde3f0;
+  font-weight: 700;
+  font-size: 10.5px;
+  padding: 5px 8px;
+  border-top: 1px solid #b0bcd8;
+  text-align: right;
+  color: #1a3a6e;
+}
+.region-card tr.reg-total td:first-child { text-align: left; }
+.region-card tr.reg-grand-total td {
+  background: #1a3a6e;
+  color: #f0c040;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-top: 2px solid #0d2550;
+  text-align: right;
+}
+.region-card tr.reg-grand-total td:first-child { text-align: left; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.grand-outstanding {
+  margin-top: 10px;
+  border: 2px solid #1a3a6e;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.grand-outstanding-head {
+  background: #1a3a6e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+}
+.grand-outstanding table { font-size: 11.5px; }
+.grand-outstanding thead tr { background: #2c4a7c; }
+.grand-outstanding thead th { padding: 6px 12px; font-size: 10.5px; }
+.grand-outstanding thead th.r { text-align: right; }
+.grand-outstanding tbody td { padding: 7px 12px; }
+.grand-outstanding tbody td.r { text-align: right; }
+.grand-outstanding tbody td.money-red { text-align:right; color:#c0392b; font-weight:600; }
+.grand-outstanding tr.go-total td {
+  background: #1a3a6e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-top: 2px solid #0d2550;
+  text-align: right;
+}
+.grand-outstanding tr.go-total td:first-child { text-align: left; }
+.grand-outstanding tr.go-total td.money-gold { color: #f0c040; text-align: right; }
+
+.doc-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #777;
+  padding: 10px 20px;
+  border-top: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+/* Loading & Error states */
+#loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #555;
+  gap: 16px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 4px solid #dde3f0;
+  border-top-color: #1a3a6e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#error-screen {
+  display: none;
+  padding: 40px 20px;
+  text-align: center;
+  color: #c0392b;
+}
+#report-body { display: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="print-bar">
+    <span>Bark Ornament Private Ltd — Daily Finance Summary</span>
+    <span id="pb-date"></span>
+  </div>
+
+  <div class="doc-header">
+    <div class="doc-header-left">
+      <div class="logo-box"><img src="logo.png" alt="Logo" onerror="this.style.display='none'"></div>
+      <div class="company-info">
+        <h1>Bark Ornament Private Ltd</h1>
+        <p id="hdr-address">No. 1, Example Road, Colombo 03<br>Tel: +94 11 000 0000</p>
+      </div>
+    </div>
+    <div class="doc-header-right">
+      <h2>Daily Finance Report</h2>
+      <p id="hdr-period">—</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="loadReport()">⟳ Refresh</button>
+    <button onclick="window.print()">🖨 Print</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <span>Loading report data from Google Sheets…</span>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-screen">
+    <p id="error-msg">Could not load data.</p>
+    <p style="margin-top:8px; font-size:11px; color:#888;">Check that your Google Apps Script Web App URL is correct and deployed as "Anyone can access".</p>
+  </div>
+
+  <!-- REPORT -->
+  <div id="report-body" class="body"></div>
+
+  <div class="doc-footer">
+    <span>Bark Ornament Private Ltd</span>
+    <span id="ftr-generated">—</span>
+    <span>Daily Finance Summary</span>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  STEP 1 ▶ Paste your Google Apps Script Web App URL here
+// ─────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+// ─────────────────────────────────────────────────────────────
+
+function fmt(v) { return (v === undefined || v === null || v === '') ? '0.00' : v; }
+
+function renderReport(d) {
+  document.getElementById('hdr-period').innerHTML = (d.period || '') + '<br>Generated: ' + (d.generatedDate || '');
+  document.getElementById('pb-date').textContent = d.generatedDate || '';
+  document.getElementById('ftr-generated').textContent = 'Generated: ' + (d.generatedDate || '');
+
+  function regionRows(list, currency) {
+    if (!list || list.length === 0) return '<tr class="empty-row"><td colspan="3">No data</td></tr>';
+    return list.map(r =>
+      `<tr><td>${r.name}</td><td class="money-red">${currency} ${r.outstanding}</td><td class="money-red">${currency} ${r.due}</td></tr>`
+    ).join('');
+  }
+
+  function payRows(list) {
+    if (!list || list.length === 0) return '<tr class="empty-row"><td colspan="3">No payables</td></tr>';
+    return list.map(r =>
+      `<tr><td>${r.name}</td><td class="money-red">Rs ${r.outstanding}</td><td class="money-red">Rs ${r.due}</td></tr>`
+    ).join('');
+  }
+
+  // d.totalLKR = bank LKR subtotal + main cash + petty cash (grand LKR)
+  // d.localGrand / seyGrand / malGrand = outstanding + due combined
+  // d.totalPayables = payOverdue + payDue combined
+
+  document.getElementById('report-body').innerHTML = `
+
+    <!-- SALES KPI -->
+    <div class="section-head">Sales Summary</div>
+    <div class="kpi-row">
+      <div class="kpi-card orange">
+        <div class="kpi-label">Export Sales (Today)</div>
+        <div class="kpi-value">Rs ${d.exportSales}</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Local Sales (Today)</div>
+        <div class="kpi-value">Rs ${d.localSales}</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Total Sales (Today)</div>
+        <div class="kpi-value">Rs ${d.totalSales}</div>
+      </div>
+    </div>
+
+    <!-- BANK BALANCE LKR -->
+    <div class="section-head">Bank Balance</div>
+    <table>
+      <thead><tr><th>Account Name</th><th>Bank</th><th>Account No</th><th class="r">Balance (LKR)</th></tr></thead>
+      <tbody>
+        <tr><td>BOC 0076987799</td><td>BOC</td><td>0076987799</td><td class="money-blue">Rs ${d.lkr1}</td></tr>
+        <tr><td>BOC 0095167662</td><td>BOC</td><td>0095167662</td><td class="money-blue">Rs ${d.lkr2}</td></tr>
+        <tr><td>BOC 0083010849</td><td>BOC</td><td>0083010849</td><td class="money-blue">Rs ${d.lkr3}</td></tr>
+        <tr><td>HNB 069010026165</td><td>HNB</td><td>069010026165</td><td class="money-blue">Rs ${d.hnb}</td></tr>
+        <tr class="grand-row"><td>Total LKR:</td><td colspan="2"></td><td class="money-red">Rs ${d.bankSub}</td></tr>
+      </tbody>
+    </table>
+
+    <!-- BANK BALANCE USD -->
+    <div class="section-head usd" style="margin-top:8px;">Foreign Currency (USD)</div>
+    <table>
+      <thead class="usd-head"><tr><th>Account Name</th><th>Bank</th><th>Account No</th><th class="r">Balance (USD)</th></tr></thead>
+      <tbody>
+        <tr><td>BOC 0076987718</td><td>BOC</td><td>0076987718</td><td class="money-blue">$ ${d.usd1}</td></tr>
+        <tr><td>BOC 0095175732</td><td>BOC</td><td>0095175732</td><td class="money-blue">$ ${d.usd2}</td></tr>
+        <tr class="grand-row"><td>Total USD:</td><td colspan="2"></td><td class="money-red">$ ${d.totalUSD}</td></tr>
+      </tbody>
+    </table>
+
+    <!-- CASH -->
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <div style="flex:1;">
+        <div class="section-head" style="margin-top:0;">Cash Details</div>
+        <table>
+          <thead><tr><th>Type</th><th class="r">Balance (LKR)</th></tr></thead>
+          <tbody>
+            <tr><td>Main Cash</td><td class="money-blue">Rs ${d.mainCash}</td></tr>
+            <tr class="subtotal-row"><td style="text-align:left;">Current Balance:</td><td class="money-red">Rs ${d.mainCash}</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1;">
+        <div class="section-head" style="margin-top:0;">Petty Cash</div>
+        <table>
+          <thead><tr><th>Type</th><th class="r">Balance (LKR)</th></tr></thead>
+          <tbody>
+            <tr><td>Petty Cash</td><td class="money-blue">Rs ${d.pettyCash}</td></tr>
+            <tr class="subtotal-row"><td style="text-align:left;">Current Balance:</td><td class="money-red">Rs ${d.pettyCash}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECEIVABLES REGIONAL -->
+    <div class="section-head" style="margin-top:16px;">Receivables — Regional Breakup</div>
+    <div class="region-grid">
+
+      <div class="region-card">
+        <div class="region-card-head">Local <span class="region-date">${d.localDate || ''}</span></div>
+        <table>
+          <thead><tr><th>Customer</th><th class="r">Outstanding</th><th class="r">Due</th></tr></thead>
+          <tbody>
+            ${regionRows(d.localList, 'Rs')}
+            <tr class="reg-total"><td>Total</td><td>Rs ${d.localTotalOut}</td><td>Rs ${d.localTotalDue}</td></tr>
+            <tr class="reg-grand-total"><td colspan="2">Grand Total Outstanding</td><td>Rs ${d.localTotalOut}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="region-card">
+        <div class="region-card-head">Seychelles <span class="region-date">${d.seyDate || ''}</span></div>
+        <table>
+          <thead><tr><th>Customer</th><th class="r">Outstanding</th><th class="r">Due</th></tr></thead>
+          <tbody>
+            ${regionRows(d.seyList, 'Rs')}
+            <tr class="reg-total"><td>Total</td><td>Rs ${d.seyTotalOut}</td><td>Rs ${d.seyTotalDue}</td></tr>
+            <tr class="reg-grand-total"><td colspan="2">Grand Total Outstanding</td><td>Rs ${d.seyTotalOut}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="region-card">
+        <div class="region-card-head">Maldives <span class="region-date">${d.malDate || ''}</span></div>
+        <table>
+          <thead><tr><th>Customer</th><th class="r">Outstanding</th><th class="r">Due</th></tr></thead>
+          <tbody>
+            ${regionRows(d.malList, 'Rs')}
+            <tr class="reg-total"><td>Total</td><td>Rs ${d.malTotalOut}</td><td>Rs ${d.malTotalDue}</td></tr>
+            <tr class="reg-grand-total"><td colspan="2">Grand Total Outstanding</td><td>Rs ${d.malTotalOut}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- RECEIVABLES GRAND TOTAL ROW -->
+    <table style="margin-top:0; border-top:none;">
+      <tbody>
+        <tr style="background:#1a3a6e;">
+          <td style="padding:9px 14px; font-weight:700; font-size:12px; color:#fff; text-transform:uppercase; letter-spacing:0.05em;">Grand Total Outstanding</td>
+          <td style="padding:9px 14px; text-align:right; font-weight:700; font-size:13px; color:#f0c040; white-space:nowrap;">Rs ${d.totalRecOutstanding}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- GRAND TOTAL OUTSTANDING BOX -->
+    <div class="grand-outstanding">
+      <div class="grand-outstanding-head">Total Receivables — Grand Total</div>
+      <table>
+        <thead><tr><th>Region</th><th class="r">Outstanding (LKR)</th><th class="r">Due (LKR)</th></tr></thead>
+        <tbody>
+          <tr><td>Local</td><td class="money-red">Rs ${d.localTotalOut}</td><td class="money-red">Rs ${d.localTotalDue}</td></tr>
+          <tr><td>Seychelles</td><td class="money-red">Rs ${d.seyTotalOut}</td><td class="money-red">Rs ${d.seyTotalDue}</td></tr>
+          <tr><td>Maldives</td><td class="money-red">Rs ${d.malTotalOut}</td><td class="money-red">Rs ${d.malTotalDue}</td></tr>
+          <tr class="go-total">
+            <td>Grand Total Outstanding</td>
+            <td class="money-gold">Rs ${d.totalRecOutstanding}</td>
+            <td class="money-gold">Rs ${d.totalRecDue}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAYABLES -->
+    <div class="section-head" style="margin-top:16px;">Payables — Supplier Wise</div>
+    <table>
+      <thead><tr><th>Supplier</th><th class="r">Outstanding (LKR)</th><th class="r">Due (LKR)</th></tr></thead>
+      <tbody>
+        ${payRows(d.payList)}
+        <tr class="grand-row">
+          <td>Grand Total:</td>
+          <td class="money-red">Rs ${d.payOverdue}</td>
+          <td class="money-red">Rs ${d.payDue}</td>
+        </tr>
+        <tr style="background:#1a3a6e;">
+          <td colspan="2" style="padding:9px 14px; font-weight:700; font-size:12px; color:#fff; text-transform:uppercase; letter-spacing:0.05em;">Grand Total Outstanding</td>
+          <td style="padding:9px 14px; text-align:right; font-weight:700; font-size:13px; color:#f0c040; white-space:nowrap;">Rs ${d.payOverdue}</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-screen').style.display = 'none';
+  document.getElementById('report-body').style.display = 'block';
+}
+
+function showError(msg) {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-msg').textContent = msg;
+  document.getElementById('error-screen').style.display = 'block';
+}
+
+function loadReport() {
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('report-body').style.display = 'none';
+  document.getElementById('error-screen').style.display = 'none';
+
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+    showError('⚠ APPS_SCRIPT_URL not set. Open index.html and paste your Google Apps Script Web App URL.');
+    return;
+  }
+
+  fetch(APPS_SCRIPT_URL)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => renderReport(data))
+    .catch(err => showError('Failed to load data: ' + err.message));
+}
+
+loadReport();
+</script>
+</body>
+</html>
