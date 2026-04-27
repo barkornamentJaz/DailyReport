@@ -447,8 +447,9 @@ function renderReport(d) {
         <table>
           <thead><tr><th>Type</th><th class="r">Balance (LKR)</th></tr></thead>
           <tbody>
-            <tr><td>Main Cash</td><td class="money-blue">Rs ${d.mainCash}</td></tr>
-            <tr class="subtotal-row"><td style="text-align:left;">Current Balance:</td><td class="money-red">Rs ${d.mainCash}</td></tr>
+            <tr><td>Closing Balance</td><td class="money-blue">Rs ${d.mainCash}</td></tr>
+            <tr><td>IOU Total</td><td class="money-red">Rs ${fmt(d.mainCashIOU)}</td></tr>
+            <tr class="subtotal-row"><td style="text-align:left;">Cash in Hand:</td><td class="money-green">Rs ${fmt(d.mainCashInHand)}</td></tr>
           </tbody>
         </table>
       </div>
@@ -457,8 +458,9 @@ function renderReport(d) {
         <table>
           <thead><tr><th>Type</th><th class="r">Balance (LKR)</th></tr></thead>
           <tbody>
-            <tr><td>Petty Cash</td><td class="money-blue">Rs ${d.pettyCash}</td></tr>
-            <tr class="subtotal-row"><td style="text-align:left;">Current Balance:</td><td class="money-red">Rs ${d.pettyCash}</td></tr>
+            <tr><td>Closing Balance</td><td class="money-blue">Rs ${d.pettyCash}</td></tr>
+            <tr><td>IOU Total</td><td class="money-red">Rs ${fmt(d.pettyCashIOU)}</td></tr>
+            <tr class="subtotal-row"><td style="text-align:left;">Cash in Hand:</td><td class="money-green">Rs ${fmt(d.pettyCashInHand)}</td></tr>
           </tbody>
         </table>
       </div>
