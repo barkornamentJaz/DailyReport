@@ -386,6 +386,20 @@ function renderReport(d) {
     ).join('');
   }
 
+  function seyRows(list) {
+    if (!list || list.length === 0) return '<tr class="empty-row"><td colspan="6">No data</td></tr>';
+    return list.map(r =>
+      `<tr>
+        <td>${r.name}</td>
+        <td class="money-blue">$ ${r.outUSD || '0.00'}</td>
+        <td class="money-blue">$ ${r.dueUSD || '0.00'}</td>
+        <td class="money-red">Rs ${r.outLKR || '0.00'}</td>
+        <td class="money-red">Rs ${r.dueLKR || '0.00'}</td>
+        <td class="money-green">Rs ${r.totalLKR || '0.00'}</td>
+      </tr>`
+    ).join('');
+  }
+
   function payRows(list) {
     if (!list || list.length === 0) return '<tr class="empty-row"><td colspan="3">No payables</td></tr>';
     return list.map(r =>
@@ -485,11 +499,28 @@ function renderReport(d) {
       <div class="region-card">
         <div class="region-card-head">Seychelles <span class="region-date">${d.seyDate || ''}</span></div>
         <table>
-          <thead><tr><th>Customer</th><th class="r">Outstanding</th><th class="r">Due</th></tr></thead>
+          <thead><tr>
+            <th>Customer</th>
+            <th class="r">Outstanding (USD)</th>
+            <th class="r">Due (USD)</th>
+            <th class="r">Outstanding (LKR)</th>
+            <th class="r">Due (LKR)</th>
+            <th class="r">Total (LKR)</th>
+          </tr></thead>
           <tbody>
-            ${regionRows(d.seyList, 'Rs')}
-            <tr class="reg-total"><td>Total</td><td>Rs ${d.seyTotalOut}</td><td>Rs ${d.seyTotalDue}</td></tr>
-            <tr class="reg-grand-total"><td colspan="2">Grand Total Outstanding</td><td>Rs ${d.seyTotalOut}</td></tr>
+            ${seyRows(d.seyList)}
+            <tr class="reg-total">
+              <td>Total</td>
+              <td>$ ${d.seyTotalOutUSD || '0.00'}</td>
+              <td>$ ${d.seyTotalDueUSD || '0.00'}</td>
+              <td>Rs ${d.seyTotalOutLKR || '0.00'}</td>
+              <td>Rs ${d.seyTotalDueLKR || '0.00'}</td>
+              <td>Rs ${d.seyGrand || '0.00'}</td>
+            </tr>
+            <tr class="reg-grand-total">
+              <td colspan="5">Grand Total Outstanding (LKR)</td>
+              <td>Rs ${d.seyGrand || '0.00'}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -525,7 +556,11 @@ function renderReport(d) {
         <thead><tr><th>Region</th><th class="r">Outstanding (LKR)</th><th class="r">Due (LKR)</th></tr></thead>
         <tbody>
           <tr><td>Local</td><td class="money-red">Rs ${d.localTotalOut}</td><td class="money-red">Rs ${d.localTotalDue}</td></tr>
-          <tr><td>Seychelles</td><td class="money-red">Rs ${d.seyTotalOut}</td><td class="money-red">Rs ${d.seyTotalDue}</td></tr>
+          <tr>
+            <td>Seychelles<br><span style="font-size:9.5px;color:#555;">USD: $ ${d.seyTotalOutUSD||'0.00'} Outstanding / $ ${d.seyTotalDueUSD||'0.00'} Due</span></td>
+            <td class="money-red">Rs ${d.seyTotalOutLKR||'0.00'}</td>
+            <td class="money-red">Rs ${d.seyTotalDueLKR||'0.00'}</td>
+          </tr>
           <tr><td>Maldives</td><td class="money-red">Rs ${d.malTotalOut}</td><td class="money-red">Rs ${d.malTotalDue}</td></tr>
           <tr class="go-total">
             <td>Grand Total Outstanding</td>
